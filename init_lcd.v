@@ -1,5 +1,4 @@
 //TODO
-//// Write
 //// Test
 
 module init_lcd(clk, start, lcd_rs, lcd_rw, lcd_e, sf_d, ready);
@@ -145,13 +144,45 @@ begin
 				counter = counter + 1;
 			end
 
+			// Display Configuration
 			if (op_status)
 			begin
-				
+				if (ready)
+				begin
+					if (counter == 0)
+					begin
+						command = 10'b0000101000;
+					end
+					else if (counter == 1)
+					begin
+						command = 10'b0000000110;
+					end
+					else if (counter == 2)
+					begin
+						command = 10'b0000001100;
+					end
+					else if (counter == 3)
+					begin
+						command = 10'b0000000001;
+					end
+					issue_command = 1'b1;
+					else if (counter < 100000)
+					begin
+						counter = counter + 1;
+					end
+					else if (counter = 100000)
+					begin
+						counter = 0;
+						op_status = 1'b0;
+						on_status = 1'b0;
+					end
+				end
+				else if (issue_command)
+				begin
+					issue_command = 1'b0;
+					counter = counter + 1;
+				end
 			end
 		end
-	
-		// Display Configuration
-
 	end
 end
