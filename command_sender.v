@@ -1,6 +1,4 @@
-// TODO:
-//// Test
-module command_sender(clk, start, rs_in, rw_in, data_in, lcd_rs, sf_d, lcd_rw, lcd_e);
+module command_sender(clk, start, rs_in, rw_in, data_in, lcd_rs, sf_d, lcd_rw, lcd_e, ready);
 
 parameter t1 = 5;
 parameter t2 = 20;
@@ -10,6 +8,7 @@ parameter t5 = 3000;
 
 // Assigning ports as input/output
 input clk;
+input start;
 input rs_in;
 input rw_in;
 input [7:0] data_in;
@@ -18,9 +17,10 @@ output reg lcd_rs;
 output reg [3:0] sf_d;
 output reg lcd_rw;
 output reg lcd_e;
+output ready;
 
 // Instantiating and Initializing Registers
-reg [10:0] counter;
+reg [11:0] counter;
 initial counter = 0;
 
 reg status;
@@ -34,6 +34,10 @@ begin
 	lcd_e = 1'b0;
 end
 
+// Assigning output wires
+assign ready = (counter == 0 & status == 1'b0);
+
+// State Machine
 always @(posedge clk)
 begin
 	// Handling status flag
