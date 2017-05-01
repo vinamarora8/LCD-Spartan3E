@@ -1,6 +1,3 @@
-//TODO
-//// Test
-
 module init_lcd(clk, start, lcd_rs, lcd_rw, lcd_e, sf_d, ready);
 
 // Assigning ports as in/out
@@ -34,7 +31,7 @@ reg [3:0] pu_sf_d;
 
 initial
 begin
-	pu_lcd_rw = 1'b1
+	pu_lcd_rw = 1'b1;
 	pu_lcd_rs = 1'b0;
 	pu_lcd_e = 1'b0;
 	pu_sf_d = 4'h0;
@@ -60,7 +57,7 @@ assign ready = (counter == 0) & (~on_status) & (~op_status);
 assign lcd_rs = (op_status) ? dc_lcd_rs : pu_lcd_rs;
 assign lcd_rw = (op_status) ? dc_lcd_rw : pu_lcd_rw;
 assign lcd_e = (op_status) ? dc_lcd_e : pu_lcd_e;
-assign sf_d = (op_status) ? dc_sf_d : pu_sf_e;
+assign sf_d = (op_status) ? dc_sf_d : pu_sf_d;
 
 command_sender command_sender_1(
 	.clk(clk),
@@ -89,50 +86,50 @@ begin
 		begin
 			if (counter == 0)
 			begin
-				sf_d = 4'h0;
-				lcd_e = 1'b0;
-				lcd_rs = 1'b0;
-				lcd_rw = 1'b0;
+				pu_sf_d = 4'h0;
+				pu_lcd_e = 1'b0;
+				pu_lcd_rs = 1'b0;
+				pu_lcd_rw = 1'b0;
 			end
 			if (counter == 750000)
 			begin
-				sf_d = 4'h3;
-				lcd_e = 1'b1;
+				pu_sf_d = 4'h3;
+				pu_lcd_e = 1'b1;
 			end
 			if (counter == 750015)
 			begin
-				sf_d = 4'h0;
-				lcd_e = 1'b0;
+				pu_sf_d = 4'h0;
+				pu_lcd_e = 1'b0;
 			end
 			if (counter == 955100)
 			begin
-				sf_d = 4'h3;
-				lcd_e = 1'b1;
+				pu_sf_d = 4'h3;
+				pu_lcd_e = 1'b1;
 			end
 			if (counter == 955115)
 			begin
-				sf_d = 4'h0;
-				lcd_e = 1'b0;
+				pu_sf_d = 4'h0;
+				pu_lcd_e = 1'b0;
 			end
 			if (counter == 960200)
 			begin
-				sf_d = 4'h3;
-				lcd_e = 1'b1;
+				pu_sf_d = 4'h3;
+				pu_lcd_e = 1'b1;
 			end
 			if (counter == 960215)
 			begin
-				sf_d = 4'h0;
-				lcd_e = 1'b0;
+				pu_sf_d = 4'h0;
+				pu_lcd_e = 1'b0;
 			end
 			if (counter == 962300)
 			begin
-				sf_d = 4'h2;
-				lcd_e = 1'b1;
+				pu_sf_d = 4'h2;
+				pu_lcd_e = 1'b1;
 			end
 			if (counter == 962315)
 			begin
-				sf_d = 4'h0;
-				lcd_e = 1'b0;
+				pu_sf_d = 4'h0;
+				pu_lcd_e = 1'b0;
 			end
 			if (counter == 964500)
 			begin
@@ -143,46 +140,50 @@ begin
 			begin
 				counter = counter + 1;
 			end
-
+		end
 			// Display Configuration
-			if (op_status)
+		if (op_status)
+		begin
+			if (command_sender_ready)
 			begin
-				if (ready)
+				if (counter == 0)
 				begin
-					if (counter == 0)
-					begin
-						command = 10'b0000101000;
-					end
-					else if (counter == 1)
-					begin
-						command = 10'b0000000110;
-					end
-					else if (counter == 2)
-					begin
-						command = 10'b0000001100;
-					end
-					else if (counter == 3)
-					begin
-						command = 10'b0000000001;
-					end
+					command = 10'b0000101000;
 					issue_command = 1'b1;
-					else if (counter < 100000)
-					begin
-						counter = counter + 1;
-					end
-					else if (counter = 100000)
-					begin
-						counter = 0;
-						op_status = 1'b0;
-						on_status = 1'b0;
-					end
 				end
-				else if (issue_command)
+				else if (counter == 1)
 				begin
-					issue_command = 1'b0;
+					command = 10'b0000000110;
+					issue_command = 1'b1;
+				end
+				else if (counter == 2)
+				begin
+					command = 10'b0000001100;
+					issue_command = 1'b1;
+				end
+				else if (counter == 3)
+				begin
+					command = 10'b0000000001;
+					issue_command = 1'b1;
+				end
+				else if (counter < 100000)
+				begin
 					counter = counter + 1;
 				end
+				else if (counter == 100000)
+				begin
+					counter = 0;
+					op_status = 1'b0;
+					on_status = 1'b0;
+				end
+			end
+			else if (issue_command)
+			begin
+				issue_command = 1'b0;
+				counter = counter + 1;
 			end
 		end
 	end
 end
+
+endmodule 
